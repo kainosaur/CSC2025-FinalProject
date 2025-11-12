@@ -1,7 +1,6 @@
 .386P
 .model flat
 public _readLine
-extern _GetStdHandle@4: near
 extern _ReadConsoleA@20: near
 ; Isaac
 .code
@@ -19,18 +18,16 @@ _readLine PROC
 	push EBP
 	mov EBP, ESP
 
-	push -10; this is the parameter which will get a read only handle from _GetStdHandle@4 IS
-	call _GetStdHandle@4; stores the handle in EAX IS
-
+	mov EAX, [EBP + 16]; puts parameter 3 into EAX IS
 	mov ECX, [EBP + 12]; puts parameter 2 into ECX IS
 	mov EDX, [EBP + 8]; puts parameter 1 into EDX IS
 
 
 	push 0
 	push ECX; provides the address of numInputs for the function to put how many inputs it read IS
-	push 5; the maximum number of inputs allowed IS
+	push 5; the maximum number of inputs allowed. IS 
 	push EDX; provides the address of string so the input can be received in the string array IS
-	push EAX
+	push EAX; provides the standard read handle
 
 	call _ReadConsoleA@20
 
