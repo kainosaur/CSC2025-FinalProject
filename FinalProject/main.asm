@@ -7,10 +7,12 @@ extern _atoi:near
 extern _itoa:near
 extern _readLine:near
 extern _writeLine:near
+extern _GetStdHandle@4: near
 
 .data
 receivedInput DB 6 DUP(0)
 numChar DD 0
+readHandle DD 0
 
 .code
 ; Kain/ Isaac
@@ -21,15 +23,23 @@ numChar DD 0
 ;Return:N/A
 main PROC
 	
+
+	push -10; this is the parameter which will get a read only handle from _GetStdHandle@4 IS
+	call _GetStdHandle@4; stores the handle in EAX IS
+	mov readHandle, EAX
+
+
+
 	call _itoa
 	call _writeLine
 
 	;calling _readLine for the first input IS
 	
+	push readHandle; pushes the value in readHandle as parameter 3 for readline IS
 	push offset numChar; pushes numChar as parameter 2 for readLine IS
 	push offset receivedInput; pushes receivedInput as parameter 1 for readLine IS
 	call _readLine
-	add ESP, 8
+	add ESP, 12
 
 
 
@@ -44,15 +54,17 @@ main PROC
 
 	;calling _readLine for the second input IS
 
+	push readHandle; pushes the value in readHandle as parameter 3 for readline IS
 	push offset numChar; readline is first called to reset the input buffer IS
 	push offset receivedInput; then called again to get the user's input. IS
 	call _readLine
-	add ESP, 8
+	add ESP, 12
 
+	push readHandle; pushes the value in readHandle as parameter 3 for readline IS
 	push offset numChar; pushes numChar as parameter 2 for readLine IS
 	push offset receivedInput; pushes receivedInput as parameter 1 for readLine IS
 	call _readLine
-	add ESP, 8
+	add ESP, 12
 
 	;calling _atoi for the second input IS
 
@@ -62,7 +74,7 @@ main PROC
 
 	;performing multiplication between the two inputs
 
-	mul EBX; multiplies EAX by EBX and stores the result in EAX (The result should never be large enough to overflow into EDX. If it does, that is a problem) ISxddddddddddddddddddd
+	mul EBX; multiplies EAX by EBX and stores the result in EAX (The result should never be large enough to overflow into EDX. If it does, that is a problem) IS
 
 	push EAX
 	call _ExitProcess@4
