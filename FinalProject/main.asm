@@ -11,8 +11,11 @@ extern _GetStdHandle@4: near
 
 .data
 receivedInput DB 6 DUP(0)
+outputString DB 11 DUP(?)
+written DW ?
 numChar DD 0
 readHandle DD 0
+writeHandle DD 0
 
 .code
 ; Kain/ Isaac
@@ -22,16 +25,14 @@ readHandle DD 0
 ;Parameters: N/A
 ;Return:N/A
 main PROC
-	
+
+	push -11; parameter to get the write console handle from _GetStdHandle@4 KD
+	call _GetStdHandle@4; retrieves write console handle place in EAX KD
+	mov writeHandle, EAX
 
 	push -10; this is the parameter which will get a read only handle from _GetStdHandle@4 IS
 	call _GetStdHandle@4; stores the handle in EAX IS
 	mov readHandle, EAX
-
-
-
-	call _itoa
-	call _writeLine
 
 	;calling _readLine for the first input IS
 	
@@ -76,7 +77,22 @@ main PROC
 
 	mul EBX; multiplies EAX by EBX and stores the result in EAX (The result should never be large enough to overflow into EDX. If it does, that is a problem) IS
 
-	push EAX
+	; Calling itoa function KD
+	push 10			; base input
+	push OFFSET outputString	; where the new itoa string will ive
+	push eax		;the num to convert to string
+	call _itoa
+	add esp, 12
+
+	; Calling write line with the num acquired from itoa KD
+	push writeHandle   
+	push OFFSET outputString
+	push LENGTHOF outputString
+	push OFFSET written
+	call _writeLine
+	add esp, 16
+
+	push 0
 	call _ExitProcess@4
 
 main ENDP
